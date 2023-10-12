@@ -29,12 +29,20 @@ def BinaryCoefficientDecomposition(data: np.ndarray, iterationDataProportion:flo
     for componentIndex in range(numComponents):
         pass
         # Determine the direction of maximum variance
+        covMatrix = np.cov(data.T)
+        eigenValues, eigenVectors = np.linalg.eig(covMatrix)
+        maxEigenValueIndex = np.argmax(eigenValues)
+        maxVarianceDirection = eigenVectors[:, maxEigenValueIndex]
 
         # Determine the subset of most similar items
+        mostAlignedDataIndices = np.flip(np.argsort(np.dot(data,maxVarianceDirection)))[:int(iterationDataProportion*len(data))]
+        mostAlignedVectors = data[mostAlignedDataIndices]
 
         # Calculate component
+        component = np.average(mostAlignedVectors, axis=0)
 
         # Reduce those items and update data matrix
+        data[mostAlignedDataIndices] -= component
 
         # Add calculated component to components matrix and update coefficient matrix
 

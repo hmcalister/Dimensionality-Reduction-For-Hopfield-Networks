@@ -53,7 +53,8 @@ if not args.loadModel:
     modelHistory = autoencoder.fit(x_train, x_train,
                     epochs=settingsDict["epochs"],
                     shuffle=True,
-                    validation_data=(x_test, x_test))
+                    validation_data=(x_test, x_test),
+                    verbose=2)
     with open("modelHistory", "wb") as f:
         pickle.dump(modelHistory.history, f)
     autoencoder.save_weights(args.modelSavePath)

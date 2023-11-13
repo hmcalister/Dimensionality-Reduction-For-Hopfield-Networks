@@ -12,6 +12,7 @@ from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 from tensorflow.keras.datasets import mnist
 
+import hmcalisterHopfieldUtils
 from autoEncoder import AutoEncoder, AutoEncoderSigmoidCustomLoss, AutoEncoderTanhCustomLoss
 
 argParser = argparse.ArgumentParser()
@@ -54,7 +55,7 @@ if not args.loadModel:
                     epochs=settingsDict["epochs"],
                     shuffle=True,
                     validation_data=(x_test, x_test),
-                    verbose=2)
+                    verbose=1)
     with open("modelHistory", "wb") as f:
         pickle.dump(modelHistory.history, f)
     autoencoder.save_weights(args.modelSavePath)
@@ -62,29 +63,34 @@ else:
     autoencoder.load_weights(args.modelSavePath)
 
 
-# encodedVectors = autoencoder.encoderNetwork(x_test).numpy()
-# decodedImages = autoencoder.decoderNetwork(encodedVectors).numpy()
+encodedVectors = autoencoder.encoderNetwork(x_test).numpy()
+decodedImages = autoencoder.decoderNetwork(encodedVectors).numpy()
+
+binaryHeaviside = hmcalisterHopfieldUtils.hopfield.binaryHeaviside
+bipolarHeaviside = hmcalisterHopfieldUtils.hopfield.bipolarHeaviside
+heavisideVectors = binaryHeaviside(encodedVectors-0.5)
+heavisideDecodedImages = autoencoder.decoderNetwork(heavisideVectors).numpy()
 
 # # ---------- ORIGINAL AND RECONSTRUCTED IMAGES ----------
-# n = 10
-# plt.figure(figsize=(20, 4))
-# for i in range(n):
-#     # display original
-#     ax = plt.subplot(2, n, i + 1)
-#     plt.imshow(x_test[i])
-#     plt.title("original")
-#     plt.gray()
-#     ax.get_xaxis().set_visible(False)
-#     ax.get_yaxis().set_visible(False)
+n = 10
+imsize = 2
+fig = plt.figure(figsize=(n*imsize, 3*imsize))
+subfigs = fig.subfigures(nrows=3, ncols=1)
 
-#     # display reconstruction
-#     ax = plt.subplot(2, n, i + 1 + n)
-#     plt.imshow(decodedImages[i])
-#     plt.title("reconstructed")
-#     plt.gray()
-#     ax.get_xaxis().set_visible(False)
-#     ax.get_yaxis().set_visible(False)
-# plt.show()
+for targetSubFig, imgs, title in zip(
+    subfigs,
+    [x_test, decodedImages, heavisideDecodedImages],
+    ["Original Images", "Directly Decoded Images", "Heaviside Decoded Images"]
+):
+    targetSubFig.suptitle(title, y=0.98)
+    axes = targetSubFig.subplots(nrows=1, ncols=n)
+    for img, ax in zip(imgs, np.ravel(axes)):
+        ax.imshow(img, cmap="gray")
+        ax.get_xaxis().set_visible(False)
+        ax.get_yaxis().set_visible(False)
+
+# plt.tight_layout()
+plt.show()
 
 
 # cmap = mpl.colormaps["tab10"]

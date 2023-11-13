@@ -5,7 +5,7 @@ TARGET_CLASSES="0 1"
 
 for trialIndex in {0..100}; do
     for LATENT_DIMENSION in {16,64,128}; do
-        for ENCODER_LOSS_WEIGHTING in $(seq 0 0.05 0.5); do
+        for ENCODER_LOSS_WEIGHTING in $(seq 0 0.002 0.05); do
             printf "\33[2K\r"
             printf "TRIAL: $trialIndex\tLATENT DIMENSION: $LATENT_DIMENSION\tENCODER LOSS WEIGHTING: $ENCODER_LOSS_WEIGHTING\r"
 

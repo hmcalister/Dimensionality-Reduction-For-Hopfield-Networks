@@ -63,34 +63,34 @@ else:
     autoencoder.load_weights(args.modelSavePath)
 
 
-encodedVectors = autoencoder.encoderNetwork(x_test).numpy()
-decodedImages = autoencoder.decoderNetwork(encodedVectors).numpy()
+# encodedVectors = autoencoder.encoderNetwork(x_test).numpy()
+# decodedImages = autoencoder.decoderNetwork(encodedVectors).numpy()
 
-binaryHeaviside = hmcalisterHopfieldUtils.hopfield.binaryHeaviside
-bipolarHeaviside = hmcalisterHopfieldUtils.hopfield.bipolarHeaviside
-heavisideVectors = binaryHeaviside(encodedVectors-0.5)
-heavisideDecodedImages = autoencoder.decoderNetwork(heavisideVectors).numpy()
+# binaryHeaviside = hmcalisterHopfieldUtils.hopfield.binaryHeaviside
+# bipolarHeaviside = hmcalisterHopfieldUtils.hopfield.bipolarHeaviside
+# heavisideVectors = binaryHeaviside(encodedVectors-0.5)
+# heavisideDecodedImages = autoencoder.decoderNetwork(heavisideVectors).numpy()
 
 # # ---------- ORIGINAL AND RECONSTRUCTED IMAGES ----------
-n = 10
-imsize = 2
-fig = plt.figure(figsize=(n*imsize, 3*imsize))
-subfigs = fig.subfigures(nrows=3, ncols=1)
+# n = 10
+# imsize = 2
+# fig = plt.figure(figsize=(n*imsize, 3*imsize))
+# subfigs = fig.subfigures(nrows=3, ncols=1)
 
-for targetSubFig, imgs, title in zip(
-    subfigs,
-    [x_test, decodedImages, heavisideDecodedImages],
-    ["Original Images", "Directly Decoded Images", "Heaviside Decoded Images"]
-):
-    targetSubFig.suptitle(title, y=0.98)
-    axes = targetSubFig.subplots(nrows=1, ncols=n)
-    for img, ax in zip(imgs, np.ravel(axes)):
-        ax.imshow(img, cmap="gray")
-        ax.get_xaxis().set_visible(False)
-        ax.get_yaxis().set_visible(False)
+# for targetSubFig, imgs, title in zip(
+#     subfigs,
+#     [x_test, decodedImages, heavisideDecodedImages],
+#     ["Original Images", "Directly Decoded Images", "Heaviside Decoded Images"]
+# ):
+#     targetSubFig.suptitle(title, y=0.98)
+#     axes = targetSubFig.subplots(nrows=1, ncols=n)
+#     for img, ax in zip(imgs, np.ravel(axes)):
+#         ax.imshow(img, cmap="gray")
+#         ax.get_xaxis().set_visible(False)
+#         ax.get_yaxis().set_visible(False)
 
-# plt.tight_layout()
-plt.show()
+# # plt.tight_layout()
+# plt.show()
 
 
 # cmap = mpl.colormaps["tab10"]

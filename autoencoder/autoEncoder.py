@@ -14,6 +14,7 @@ class AutoEncoder(tf.keras.models.Model):
         :param hiddenLayerShapes: A list of integers defining the layer shapes from input through to (and including) the final encoder layer.
             The first entry should be the first layer shape *after* the input. The last entry should be the shape of the final layer *before* the encoder output.
             This list is reversed and used for the decoder to give an hourglass network shape.
+            If two separate lists are given, these are used first for the encoder layers, then the decoder.
         :param hiddenLayerActivationFunction: The activation function to use for the hidden layers (i.e. not the encoder output and not the decoder output).
         :param encoderOutputActivationFunction: The activation function to use for the encoder output.
 
@@ -64,15 +65,27 @@ class AutoEncoder(tf.keras.models.Model):
         self.decoderOutputActivationFunction = decoderOutputActivationFunction
 
         encoderNetworkLayers = [tf.keras.layers.Flatten()]
-        for shape in self.hiddenLayerShapes:
-            encoderNetworkLayers.append(tf.keras.layers.Dense(shape, self.hiddenLayerActivationFunction))
-        encoderNetworkLayers.append(tf.keras.layers.Dense(self.latentShape, self.encoderOutputActivationFunction, name="encoderOutput"))
+        if type(self.hiddenLayerShapes[0]) is int:
+            for shape in self.hiddenLayerShapes:
+                encoderNetworkLayers.append(tf.keras.layers.Dense(shape, self.hiddenLayerActivationFunction))
+            encoderNetworkLayers.append(tf.keras.layers.Dense(self.latentShape, self.encoderOutputActivationFunction, name="encoderOutput"))
 
-        decoderNetworkLayers = []
-        for shape in self.hiddenLayerShapes[::-1]:
-            decoderNetworkLayers.append(tf.keras.layers.Dense(shape, hiddenLayerActivationFunction))
-        decoderNetworkLayers.append(tf.keras.layers.Dense(tf.math.reduce_prod(self.inputShape), self.decoderOutputActivationFunction))
-        decoderNetworkLayers.append(tf.keras.layers.Reshape(inputShape))
+            decoderNetworkLayers = []
+            for shape in self.hiddenLayerShapes[::-1]:
+                decoderNetworkLayers.append(tf.keras.layers.Dense(shape, hiddenLayerActivationFunction))
+            decoderNetworkLayers.append(tf.keras.layers.Dense(tf.math.reduce_prod(self.inputShape), self.decoderOutputActivationFunction))
+            decoderNetworkLayers.append(tf.keras.layers.Reshape(inputShape))
+
+        else:
+            for shape in self.hiddenLayerShapes[0]:
+                encoderNetworkLayers.append(tf.keras.layers.Dense(shape, self.hiddenLayerActivationFunction))
+            encoderNetworkLayers.append(tf.keras.layers.Dense(self.latentShape, self.encoderOutputActivationFunction, name="encoderOutput"))
+
+            decoderNetworkLayers = []
+            for shape in self.hiddenLayerShapes[1]:
+                decoderNetworkLayers.append(tf.keras.layers.Dense(shape, hiddenLayerActivationFunction))
+            decoderNetworkLayers.append(tf.keras.layers.Dense(tf.math.reduce_prod(self.inputShape), self.decoderOutputActivationFunction))
+            decoderNetworkLayers.append(tf.keras.layers.Reshape(inputShape))
 
         self.encoderNetwork = tf.keras.Sequential(encoderNetworkLayers, name="encoder")
         self.decoderNetwork = tf.keras.Sequential(decoderNetworkLayers, name="decoder")

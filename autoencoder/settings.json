@@ -1,15 +1,1 @@
-{
-    "epochs": 10,
-    "hiddenLayerShapes": [
-        128,
-        64,
-        64
-    ],
-    "latentDimension": 16,
-    "encoderActivation": "tanh",
-    "targetClasses": [
-        0,
-        1
-    ],
-    "encoderLossWeighting": 0.01
-}
+{"epochs": 10, "hiddenLayerShapes": [128, 64, 64], "latentDimension": 16, "encoderActivation": "sigmoid", "targetClasses": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], "encoderLossWeighting": 0.016}

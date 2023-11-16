@@ -1,3 +1,4 @@
 model.keras
 modelHistory
+modelSaves/*
 *.log
